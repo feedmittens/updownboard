@@ -24,7 +24,8 @@ class StateStore:
                 )
             """)
 
-    def update(self, system_name: str, new_state: str, failed_checks: list):
+    def update(self, system_name: str, new_state: str, failed_checks: list) -> tuple[str | None, str, str]:
+        """Update state. Returns (old_state, new_state, reason) — old_state is None on first check."""
         reason = (
             "; ".join(f"{c['type']}: {c['message']}" for c in failed_checks)
             if failed_checks
@@ -42,6 +43,8 @@ class StateStore:
 
         if old_state != new_state:
             self._record_change(system_name, old_state, new_state, reason)
+
+        return old_state, new_state, reason
 
     def _record_change(self, system_name: str, from_state, to_state: str, reason: str):
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

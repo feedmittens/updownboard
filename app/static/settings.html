@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpDownBoard — Settings</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .settings-wrap {
+      max-width: 640px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .settings-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.25rem;
+    }
+
+    .settings-subtitle {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 1.1rem;
+    }
+
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.35rem;
+    }
+
+    .label-hint {
+      font-weight: 400;
+      color: #475569;
+      margin-left: 0.4rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    textarea {
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      font-size: 0.8rem;
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #334155;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: #94a3b8;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .toggle input:checked + .slider { background: #1d4ed8; }
+    .toggle input:checked + .slider::before { transform: translateX(18px); background: #fff; }
+
+    .toggle-label { font-size: 0.9rem; font-weight: 600; color: #e2e8f0; }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-ghost   { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+    .status-msg {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 5px;
+      display: none;
+    }
+    .status-msg.ok  { background: #0f2e1a; color: #4ade80; border: 1px solid #166534; display: block; }
+    .status-msg.err { background: #2b0d0d; color: #f87171; border: 1px solid #7f1d1d; display: block; }
+
+    .test-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+      margin-top: 0.75rem;
+    }
+
+    .test-row .field { flex: 1; margin: 0; }
+
+    @media (max-width: 520px) {
+      .row-2, .row-3 { grid-template-columns: 1fr; }
+      .test-row { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><a href="/" style="color:inherit;text-decoration:none">UpDownBoard</a></h1>
+    <span id="last-updated"></span>
+  </header>
+
+  <div class="settings-wrap">
+    <div class="settings-title">Notification settings</div>
+    <div class="settings-subtitle">Settings are saved to <code>notifications.yaml</code> on the server.</div>
+
+    <!-- Enable toggle -->
+    <div class="card">
+      <div class="card-title">Email notifications</div>
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="enabled">
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">Enable email notifications</span>
+      </div>
+
+      <div class="field">
+        <label>Notify on <span class="label-hint">— when to send</span></label>
+        <select id="notify_on">
+          <option value="both">State change in either direction (down + recovery)</option>
+          <option value="down">Down only — when a system goes RED</option>
+          <option value="recovery">Recovery only — when a system returns to GREEN</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SMTP -->
+    <div class="card">
+      <div class="card-title">SMTP server</div>
+      <div class="row-3 field">
+        <div>
+          <label>Host</label>
+          <input type="text" id="smtp_host" placeholder="smtp.gmail.com">
+        </div>
+        <div>
+          <label>Port</label>
+          <input type="number" id="smtp_port" placeholder="587" min="1" max="65535">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <label class="toggle" style="margin-bottom:0">
+            <input type="checkbox" id="smtp_use_tls" checked>
+            <span class="slider"></span>
+          </label>
+          <span style="margin-left:0.6rem;font-size:0.82rem;color:#94a3b8">STARTTLS</span>
+        </div>
+      </div>
+      <div class="row-2 field">
+        <div>
+          <label>Username</label>
+          <input type="text" id="smtp_user" placeholder="alerts@example.com" autocomplete="off">
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" id="smtp_password" placeholder="app password" autocomplete="new-password">
+        </div>
+      </div>
+    </div>
+
+    <!-- Addressing -->
+    <div class="card">
+      <div class="card-title">Addressing</div>
+      <div class="field">
+        <label>From</label>
+        <input type="text" id="from_address" placeholder="UpDownBoard &lt;alerts@example.com&gt;">
+      </div>
+      <div class="field">
+        <label>To <span class="label-hint">— one address per line</span></label>
+        <textarea id="to_addresses" rows="3" placeholder="admin@example.com&#10;oncall@example.com"></textarea>
+      </div>
+    </div>
+
+    <!-- Templates -->
+    <div class="card">
+      <div class="card-title">Message templates</div>
+      <p style="font-size:0.78rem;color:#475569;margin-bottom:1rem">
+        Available placeholders: <code>{system}</code> &nbsp;<code>{state}</code> &nbsp;<code>{reason}</code> &nbsp;<code>{timestamp}</code>
+      </p>
+      <div class="field">
+        <label>Subject</label>
+        <input type="text" id="subject_template" placeholder="[{state}] {system} — UpDownBoard">
+      </div>
+      <div class="field">
+        <label>Body</label>
+        <textarea id="body_template" rows="5"></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar">
+      <button class="btn btn-primary" id="save-btn" onclick="saveSettings()">Save settings</button>
+      <span class="status-msg" id="save-status"></span>
+    </div>
+
+    <!-- Test email -->
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-title">Test</div>
+      <div class="test-row">
+        <div class="field">
+          <label>Send a test email to</label>
+          <input type="email" id="test-address" placeholder="you@example.com">
+        </div>
+        <button class="btn btn-ghost" onclick="sendTest()">Send test</button>
+      </div>
+      <div style="margin-top:0.75rem">
+        <span class="status-msg" id="test-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/settings.js"></script>
+</body>
+</html>

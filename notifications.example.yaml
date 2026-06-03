@@ -1,0 +1,29 @@
+email:
+  enabled: false
+
+  # SMTP server settings
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  smtp_use_tls: true          # STARTTLS — set false for plain or SSL-only servers
+  smtp_user: "alerts@example.com"
+  smtp_password: "your-app-password"
+
+  # Addressing
+  from_address: "UpDownBoard <alerts@example.com>"
+  to_addresses:
+    - "admin@example.com"
+
+  # When to send
+  # Options: "down" | "recovery" | "both"
+  notify_on: "both"
+
+  # Templates — available placeholders: {system} {state} {reason} {timestamp}
+  subject_template: "[{state}] {system} — UpDownBoard"
+  body_template: |
+    System:    {system}
+    New state: {state}
+    Reason:    {reason}
+    Time:      {timestamp}
+
+    --
+    UpDownBoard
