@@ -1,0 +1,15 @@
+[Unit]
+Description=UpDownBoard Network Monitor
+After=network.target
+
+[Service]
+Type=simple
+User=updownboard
+WorkingDirectory=/opt/updownboard
+ExecStart=/opt/updownboard/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
