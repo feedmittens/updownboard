@@ -1,44 +1,62 @@
 # UpDownBoard
 
+[![CI](https://github.com/feedmittens/updownboard/actions/workflows/ci.yml/badge.svg)](https://github.com/feedmittens/updownboard/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/feedmittens/updownboard/actions/workflows/codeql.yml/badge.svg)](https://github.com/feedmittens/updownboard/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+
 A lightweight network monitoring dashboard. Each system gets a GREEN or RED tile. Click a RED tile to see what broke.
 
-**Version: 0.1.0**
+**[feedmittens.github.io/updownboard](https://feedmittens.github.io/updownboard)** — project page with install instructions
+
+**Version: 0.2.0**
+
+---
+
+## Quick Install
+
+Download and run the installer for your platform — it handles Python, config, and service setup.
+
+**Linux**
+```bash
+curl -fsSL https://raw.githubusercontent.com/feedmittens/updownboard/main/install-linux.sh -o install.sh
+chmod +x install.sh && ./install.sh
+```
+
+**macOS**
+```bash
+curl -fsSL https://raw.githubusercontent.com/feedmittens/updownboard/main/install.sh -o install.sh
+chmod +x install.sh && ./install.sh
+```
+
+**Windows** (PowerShell)
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/feedmittens/updownboard/main/install.ps1" -OutFile install.ps1
+.\install.ps1
+```
+
+> If scripts are blocked: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+Each installer will ask which deployment mode you want:
+- **Docker** — easiest; container + auto-start service
+- **Standalone** — native Python, systemd/launchd/Windows Service
+- **Apache / IIS** — standalone behind a reverse proxy (TLS, auth, access logs)
 
 ---
 
 ## Features
 
-- **Dashboard** — responsive grid of RED/GREEN status tiles, refreshes every 15 seconds
-- **Click to diagnose** — click any RED tile to see exactly which check failed and why
-- **Status feed** — `/status` returns plain text: current state + state-change history (useful on a secondary monitor or `watch curl`)
+- **Dashboard** — responsive RED/GREEN tile grid, auto-refreshes every 15 seconds
+- **Click to diagnose** — expand any RED tile to see exactly which check failed and why
+- **Status feed** — `/status` plain text: current state + state-change history (great with `watch curl`)
 - **Configurable checks** per system:
   - `ping` — ICMP reachability
-  - `http` — GET request with configurable expected status code
+  - `http` — GET with configurable expected status code
   - `tcp` — TCP port open check
-  - `ssh_metrics` — CPU, memory, and disk usage via SSH (Linux hosts, key auth)
-  - `snmp` — OID poll (network gear, Linux, Windows with SNMP enabled)
+  - `ssh_metrics` — CPU load, memory, disk usage via SSH (key auth, no agent)
+  - `snmp` — OID poll (routers, switches, Linux, Windows SNMP)
 - **YAML config** — add/remove systems by editing `config.yaml` and restarting
-- **SQLite history** — state changes persisted locally, no external DB required
-- **Systemd-managed** — ships with a service unit and a one-shot LXC setup script
-
----
-
-## Quick Start (local / dev)
-
-```bash
-git clone https://github.com/feedmittens/updownboard.git
-cd updownboard
-
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-
-cp config.example.yaml config.yaml
-# Edit config.yaml to add your systems
-
-uvicorn app.main:app --host 0.0.0.0 --port 8080
-```
-
-Open `http://localhost:8080` — the dashboard is the landing page.
+- **Local history** — state changes persisted to SQLite, no external DB required
 
 ---
 
@@ -104,7 +122,6 @@ systems:
 - Requires SSH key auth from the UpDownBoard service user to the monitored host
 - Requires `python3` on the remote host (standard on all modern Linux distros)
 - CPU metric is 1-minute load average relative to CPU count — not instantaneous usage
-- On Python 3.12+, install `pysnmp-lextudio` instead of `pysnmp` if SNMP checks fail to import
 
 ---
 
@@ -118,49 +135,63 @@ systems:
 
 ---
 
-## LXC Deployment (Proxmox)
+## Docker (local / dev)
 
-1. Create a Debian or Ubuntu LXC container in Proxmox
-2. SSH in as root and run:
+```bash
+cp config.example.yaml config.yaml
+# edit config.yaml
+
+docker compose up -d
+```
+
+Open `http://localhost:8080`. The container needs `NET_RAW` capability (already set in `docker-compose.yml`) for ICMP ping to work.
+
+---
+
+## Manual / Dev Setup
+
+```bash
+git clone https://github.com/feedmittens/updownboard.git
+cd updownboard
+
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+cp config.example.yaml config.yaml
+# edit config.yaml
+
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+```
+
+---
+
+## LXC / Bare-Metal Deployment (Proxmox)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/feedmittens/updownboard/main/deploy/setup.sh)
 ```
 
-3. Edit `/opt/updownboard/config.yaml`
-4. `systemctl start updownboard`
-
-The service runs on port **8080**. To check logs: `journalctl -u updownboard -f`
+Edit `/opt/updownboard/config.yaml`, then `systemctl start updownboard`.
 
 ### SSH key setup for `ssh_metrics`
 
-The service runs as the `updownboard` system user. Set up key auth from that user to any hosts you want to monitor with `ssh_metrics`:
-
 ```bash
-# On the UpDownBoard LXC:
+# On the UpDownBoard host:
 sudo -u updownboard ssh-keygen -t ed25519 -f /home/updownboard/.ssh/id_ed25519 -N ""
 sudo -u updownboard cat /home/updownboard/.ssh/id_ed25519.pub
-
 # Append that public key to ~/.ssh/authorized_keys on each monitored host
-# Use a dedicated low-privilege user on the monitored hosts (e.g., "monitor")
 ```
 
 In `config.yaml`, set `key_file: "/home/updownboard/.ssh/id_ed25519"`.
 
 ---
 
-## Development
+## Contributing
 
-```bash
-# Install deps
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-
-# Run with auto-reload
-uvicorn app.main:app --reload --port 8080
-```
-
-No test suite yet — tracked in TODO below.
+PRs welcome. Please:
+1. Fork and branch from `main`
+2. All PRs go through the CI pipeline (security scan, linting, Trivy image scan)
+3. Keep `config.yaml` out of commits — it's gitignored for a reason
 
 ---
 
@@ -168,7 +199,7 @@ No test suite yet — tracked in TODO below.
 
 - [ ] Tests: smoke tests for each check type
 - [ ] UI: in-app config editor (add/edit/remove systems without restarting)
-- [ ] Config: API endpoint to POST a new config and trigger reload (no restart)
+- [ ] Config: POST endpoint to reload config without restart
 - [ ] Notifications: optional webhook/email on state change
 - [ ] SNMP v3 support
 - [ ] Windows: WMI metrics check (CPU/mem/disk without SSH)
@@ -183,4 +214,5 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
+A [Corkscrew Consulting Group](https://corkscrew-consulting.net) project.

@@ -6,6 +6,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.2.0] — 2026-06-03
+
+### Added
+- GitHub Pages landing page (`docs/`) with CCG branding, feature overview, and platform install tabs
+- Installer scripts for Linux (`install-linux.sh`), macOS (`install.sh`), and Windows (`install.ps1`)
+  - Each offers three deployment modes: Docker, standalone uvicorn, and reverse proxy (Apache / IIS)
+  - Linux/macOS: systemd and launchd service setup included
+  - Windows: NSSM-based Windows Service + IIS ARR reverse proxy config
+- CI pipeline via GitHub Actions: `pip-audit`, `Bandit`, `Trivy` Docker image scan on every PR
+- CodeQL SAST workflow (GitHub's static analysis, runs on push and PR to `main`)
+- Dependabot config for pip dependencies and GitHub Actions version pins
+- `Dockerfile` and `docker-compose.yml` for container-based deployment and local dev
+
+### Fixed
+- Crash on startup (SIGILL / exit 132) caused by `paramiko` import on ARM64 Docker builds — check-type imports are now lazy, so `ssh_metrics` is only imported when that check type is actually configured
+
+### Changed
+- README rewritten: quick-install section, deployment options, CI badges
+
+---
+
 ## [0.1.0] — 2026-05-30
 
 ### Added

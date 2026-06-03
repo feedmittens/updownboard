@@ -1,0 +1,10 @@
+services:
+  updownboard:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    cap_add:
+      - NET_RAW
+    restart: unless-stopped
