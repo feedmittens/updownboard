@@ -215,4 +215,4 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## License
 
 MIT — see [LICENSE](LICENSE).
-A [Corkscrew Consulting Group](https://corkscrew-consulting.net) project.
+A [Corkscrew Consulting Group](https://www.corkscrewconsulting.net) project.
