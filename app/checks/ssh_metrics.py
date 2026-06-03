@@ -53,7 +53,8 @@ async def check_ssh_metrics(
 def _run_ssh(host, port, username, key_file, cpu_max, mem_max, disk_max):
     try:
         client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.load_system_host_keys()
+        client.set_missing_host_key_policy(paramiko.RejectPolicy())
         client.connect(
             host,
             port=port,
@@ -64,7 +65,7 @@ def _run_ssh(host, port, username, key_file, cpu_max, mem_max, disk_max):
 
         encoded = base64.b64encode(_METRICS_SCRIPT.strip().encode()).decode()
         cmd = f"echo {encoded} | base64 -d | python3"
-        _, stdout, stderr = client.exec_command(cmd, timeout=20)
+        _, stdout, stderr = client.exec_command(cmd, timeout=20)  # nosec B601 — cmd is a hardcoded base64-encoded static script
         out = stdout.read().decode().strip()
         client.close()
 
