@@ -3,15 +3,17 @@ import logging
 
 from .checks import run_check
 from .config import AppConfig, SystemConfig
+from .notifications import Notifier
 from .state import StateStore
 
 logger = logging.getLogger(__name__)
 
 
 class Monitor:
-    def __init__(self, config: AppConfig, state: StateStore):
+    def __init__(self, config: AppConfig, state: StateStore, notifier: Notifier | None = None):
         self.config = config
         self.state = state
+        self.notifier = notifier
 
     async def run(self):
         logger.info(f"Monitor started — {len(self.config.systems)} systems, {self.config.poll_interval}s interval")
@@ -36,8 +38,11 @@ class Monitor:
                 failed.append({"type": check.type, "message": str(e)})
 
         new_state = "GREEN" if not failed else "RED"
-        self.state.update(system.name, new_state, failed)
+        old_state, new_state, reason = self.state.update(system.name, new_state, failed)
 
         if failed:
-            reasons = "; ".join(f['message'] for f in failed)
-            logger.warning(f"RED  {system.name}: {reasons}")
+            logger.warning(f"RED  {system.name}: {reason}")
+
+        if self.notifier and old_state != new_state:
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, self.notifier.notify, system.name, old_state, new_state, reason)

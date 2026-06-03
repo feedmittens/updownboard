@@ -4,6 +4,7 @@ __pycache__/
 venv/
 .env
 config.yaml
+notifications.yaml
 updownboard.db
 *.log
 .DS_Store
