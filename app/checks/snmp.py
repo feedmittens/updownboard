@@ -36,7 +36,7 @@ def _snmp_get(host, community, oid, port, timeout):
         error_indication, error_status, error_index, var_binds = next(
             getCmd(
                 SnmpEngine(),
-                CommunityData(community, mpModel=0),
+                CommunityData(community, mpModel=0),  # nosec B508 — SNMPv1/v2 support is intentional
                 UdpTransportTarget((host, port), timeout=timeout, retries=1),
                 ContextData(),
                 ObjectType(ObjectIdentity(oid)),

@@ -55,12 +55,11 @@ class StateStore:
                 "INSERT INTO state_changes (timestamp, system, from_state, to_state, reason) VALUES (?,?,?,?,?)",
                 (ts, system_name, from_state, to_state, reason),
             )
-            conn.execute(f"""
-                DELETE FROM state_changes
-                WHERE id NOT IN (
-                    SELECT id FROM state_changes ORDER BY id DESC LIMIT {limit}
-                )
-            """)
+            conn.execute(
+                "DELETE FROM state_changes WHERE id NOT IN "
+                "(SELECT id FROM state_changes ORDER BY id DESC LIMIT ?)",
+                (int(limit),),
+            )
 
     def get_all_states(self) -> dict:
         with self._lock:
