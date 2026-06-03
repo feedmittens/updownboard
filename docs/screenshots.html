@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpDownBoard — Screenshots</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --code-bg: #1c2128;
+
+      /* App palette — matches style.css exactly */
+      --app-bg:      #0f172a;
+      --app-header:  #1e293b;
+      --app-border:  #334155;
+      --app-text:    #e2e8f0;
+      --app-muted:   #64748b;
+      --tile-green-bg: #15803d;
+      --tile-green-border: #22c55e;
+      --tile-red-bg:    #991b1b;
+      --tile-red-border: #ef4444;
+      --tile-unk-bg:    #374151;
+      --tile-unk-border: #6b7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Site nav ── */
+    .site-nav {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: var(--surface);
+    }
+
+    .site-nav .logo {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .site-nav .logo .up   { color: #3fb950; }
+    .site-nav .logo .down { color: #f85149; }
+
+    .site-nav a {
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .site-nav a:hover { color: var(--accent); text-decoration: none; }
+    .site-nav a.active { color: var(--accent); }
+
+    /* ── Page header ── */
+    .page-header {
+      padding: 48px 24px 36px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .screenshot-block {
+      margin-bottom: 64px;
+    }
+
+    .screenshot-block h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .screenshot-block .caption {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* ── Browser frame ── */
+    .browser {
+      background: #0a0e13;
+      border: 1px solid #2d333b;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .browser-bar {
+      background: #1c2128;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #2d333b;
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .url-bar {
+      flex: 1;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: "SFMono-Regular", Menlo, monospace;
+      color: #8b949e;
+      margin-left: 4px;
+    }
+
+    /* ── App rendered inside browser ── */
+    .app-shell {
+      background: var(--app-bg);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: var(--app-header);
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .app-header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+    }
+
+    .app-header .last-updated {
+      font-size: 0.78rem;
+      color: var(--app-muted);
+    }
+
+    .app-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      padding: 2rem;
+    }
+
+    .tile {
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .tile.green  { background: var(--tile-green-bg); border: 2px solid var(--tile-green-border); }
+    .tile.red    { background: var(--tile-red-bg);   border: 2px solid var(--tile-red-border); }
+    .tile.unknown { background: var(--tile-unk-bg);  border: 2px solid var(--tile-unk-border); }
+
+    .tile-name  { font-size: 0.85rem; font-weight: 600; color: #fff; word-break: break-word; line-height: 1.3; }
+    .tile-badge { margin-top: 0.5rem; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em; opacity: 0.85; color: #fff; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      position: relative;
+    }
+
+    .modal-overlay .app-grid-dimmed {
+      filter: brightness(0.35);
+      pointer-events: none;
+    }
+
+    .modal-float {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 2rem;
+      width: 420px;
+      max-width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+      z-index: 10;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: #94a3b8;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .modal-title { font-size: 1.15rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.4rem; }
+    .modal-state { font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem; }
+
+    .check-row {
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .check-row.fail { border-left: 3px solid #ef4444; color: #fca5a5; }
+    .check-row.pass { border-left: 3px solid #22c55e; color: #86efac; }
+
+    .modal-time { margin-top: 1rem; font-size: 0.7rem; color: #475569; }
+
+    /* ── Status page (plain text in browser) ── */
+    .status-body {
+      background: #0f172a;
+      padding: 2rem;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: #cbd5e1;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .status-green { color: #4ade80; }
+    .status-red   { color: #f87171; }
+    .status-dim   { color: #475569; }
+    .status-head  { color: #93c5fd; font-weight: 700; }
+
+    /* ── API JSON ── */
+    .json-body {
+      background: #0f172a;
+      padding: 2rem;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .j-key    { color: #79c0ff; }
+    .j-str-g  { color: #4ade80; }
+    .j-str-r  { color: #f87171; }
+    .j-str    { color: #a5d6ff; }
+    .j-num    { color: #ffa657; }
+    .j-punct  { color: #8b949e; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .tile { width: 110px; height: 110px; }
+      .tile-name { font-size: 0.75rem; }
+      .modal-float { width: 90%; padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span class="logo"><span class="up">Up</span><span class="down">Down</span>Board</span>
+  <a href="index.html">Overview</a>
+  <a href="screenshots.html" class="active">Screenshots</a>
+  <a href="https://github.com/feedmittens/updownboard">GitHub</a>
+</nav>
+
+<div class="page-header">
+  <h1>Screenshots</h1>
+  <p>What UpDownBoard actually looks like running on your network.</p>
+</div>
+
+<main>
+
+  <!-- ── 1. Dashboard overview ── -->
+  <div class="screenshot-block">
+    <h2>Dashboard</h2>
+    <p class="caption">
+      The main view. Each tile represents one monitored system — GREEN means all checks are passing,
+      RED means something is broken. Tiles update automatically every 15 seconds.
+    </p>
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="url-bar">http://updownboard.local:8080/</span>
+      </div>
+      <div class="app-shell">
+        <div class="app-header">
+          <h1>UpDownBoard</h1>
+          <span class="last-updated">Last updated: 11:14:32 AM</span>
+        </div>
+        <div class="app-grid">
+          <div class="tile green"><div class="tile-name">Router</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile green"><div class="tile-name">Proxmox Host</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile green"><div class="tile-name">NAS-01</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile red"><div class="tile-name">prod-db-01</div><div class="tile-badge">RED</div></div>
+          <div class="tile green"><div class="tile-name">Cloudflare DNS</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile red"><div class="tile-name">Jenkins</div><div class="tile-badge">RED</div></div>
+          <div class="tile green"><div class="tile-name">Web App</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile green"><div class="tile-name">GitHub</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile red"><div class="tile-name">VPN Gateway</div><div class="tile-badge">RED</div></div>
+          <div class="tile green"><div class="tile-name">Linux Server</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile green"><div class="tile-name">Windows Host</div><div class="tile-badge">GREEN</div></div>
+          <div class="tile red"><div class="tile-name">Staging Env</div><div class="tile-badge">RED</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. RED tile expanded ── -->
+  <div class="screenshot-block">
+    <h2>Failure detail</h2>
+    <p class="caption">
+      Click any RED tile to see exactly which check failed and the error message.
+      Ping down and Postgres unreachable — something went sideways with prod-db-01.
+    </p>
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="url-bar">http://updownboard.local:8080/</span>
+      </div>
+      <div class="app-shell">
+        <div class="app-header">
+          <h1>UpDownBoard</h1>
+          <span class="last-updated">Last updated: 11:14:32 AM</span>
+        </div>
+        <div class="modal-overlay">
+          <div class="app-grid app-grid-dimmed" style="filter:brightness(0.3)">
+            <div class="tile green"><div class="tile-name">Router</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">Proxmox Host</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">NAS-01</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile red"><div class="tile-name">prod-db-01</div><div class="tile-badge">RED</div></div>
+            <div class="tile green"><div class="tile-name">Cloudflare DNS</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile red"><div class="tile-name">Jenkins</div><div class="tile-badge">RED</div></div>
+            <div class="tile green"><div class="tile-name">Web App</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">GitHub</div><div class="tile-badge">GREEN</div></div>
+          </div>
+          <div class="modal-float">
+            <span class="modal-close-btn">&times;</span>
+            <div class="modal-title">prod-db-01</div>
+            <div class="modal-state">Status: RED &nbsp;—&nbsp; ping: Ping failed: host unreachable; tcp: Port 5432 timed out</div>
+            <div class="check-row fail"><strong>ping</strong>: Ping failed: host unreachable</div>
+            <div class="check-row fail"><strong>tcp</strong>: Port 5432 timed out</div>
+            <div class="modal-time">Last checked: 6/3/2026, 11:14:31 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Green tile ── -->
+  <div class="screenshot-block">
+    <h2>All-clear detail</h2>
+    <p class="caption">
+      Green tiles show passing status too. CPU 42%, memory 61%, disk 38% — Linux Server is doing fine.
+    </p>
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="url-bar">http://updownboard.local:8080/</span>
+      </div>
+      <div class="app-shell">
+        <div class="app-header">
+          <h1>UpDownBoard</h1>
+          <span class="last-updated">Last updated: 11:14:32 AM</span>
+        </div>
+        <div class="modal-overlay">
+          <div class="app-grid" style="filter:brightness(0.3)">
+            <div class="tile green"><div class="tile-name">Router</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">Proxmox Host</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">NAS-01</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile red"><div class="tile-name">prod-db-01</div><div class="tile-badge">RED</div></div>
+            <div class="tile green"><div class="tile-name">Cloudflare DNS</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile red"><div class="tile-name">Jenkins</div><div class="tile-badge">RED</div></div>
+            <div class="tile green"><div class="tile-name">Linux Server</div><div class="tile-badge">GREEN</div></div>
+            <div class="tile green"><div class="tile-name">GitHub</div><div class="tile-badge">GREEN</div></div>
+          </div>
+          <div class="modal-float">
+            <span class="modal-close-btn">&times;</span>
+            <div class="modal-title">Linux Server</div>
+            <div class="modal-state">Status: GREEN &nbsp;—&nbsp; all checks passed</div>
+            <div class="check-row pass"><strong>ping</strong>: Ping OK</div>
+            <div class="check-row pass"><strong>tcp</strong>: Port 22 open</div>
+            <div class="check-row pass"><strong>ssh_metrics</strong>: CPU 42% Mem 61% Disk 38%</div>
+            <div class="modal-time">Last checked: 6/3/2026, 11:14:31 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. /status plain text ── -->
+  <div class="screenshot-block">
+    <h2><code style="font-size:1rem">/status</code> endpoint</h2>
+    <p class="caption">
+      Plain-text view of the current state and recent state-change history.
+      Useful on a wall monitor with <code>watch curl http://updownboard.local:8080/status</code>,
+      or piped into anything that reads text.
+    </p>
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="url-bar">http://updownboard.local:8080/status</span>
+      </div>
+      <div class="status-body"><span class="status-head">UpDownBoard Status</span>
+<span class="status-head">========================================</span>
+
+<span class="status-head">CURRENT STATE:</span>
+  <span class="status-green">GREEN  </span>  Cloudflare DNS
+  <span class="status-green">GREEN  </span>  GitHub
+  <span class="status-green">GREEN  </span>  Linux Server
+  <span class="status-green">GREEN  </span>  NAS-01
+  <span class="status-green">GREEN  </span>  Proxmox Host
+  <span class="status-green">GREEN  </span>  Router
+  <span class="status-green">GREEN  </span>  Web App
+  <span class="status-green">GREEN  </span>  Windows Host
+  <span class="status-red">RED    </span>  Jenkins
+  <span class="status-red">RED    </span>  Staging Env
+  <span class="status-red">RED    </span>  VPN Gateway
+  <span class="status-red">RED    </span>  prod-db-01
+
+<span class="status-head">RECENT STATE CHANGES:</span>
+  <span class="status-dim">[2026-06-03 11:09:14]</span> prod-db-01: UNKNOWN -> RED (ping: Ping failed: host unreachable; tcp: Port 5432 timed out)
+  <span class="status-dim">[2026-06-03 11:09:14]</span> Jenkins: UNKNOWN -> RED (ping: Ping failed: host unreachable; http: HTTP timeout after 10s)
+  <span class="status-dim">[2026-06-03 11:09:14]</span> VPN Gateway: UNKNOWN -> RED (ping: Ping failed: host unreachable; tcp: Port 1194 timed out)
+  <span class="status-dim">[2026-06-03 11:09:14]</span> Staging Env: UNKNOWN -> RED (ping: Ping failed: host unreachable; http: HTTP timeout after 10s)
+  <span class="status-dim">[2026-06-03 10:52:07]</span> Linux Server: RED -> GREEN (all checks passed)
+  <span class="status-dim">[2026-06-03 10:51:52]</span> NAS-01: UNKNOWN -> GREEN (all checks passed)
+  <span class="status-dim">[2026-06-03 10:51:52]</span> Router: UNKNOWN -> GREEN (all checks passed)
+</div>
+    </div>
+  </div>
+
+  <!-- ── 5. /api/systems JSON ── -->
+  <div class="screenshot-block">
+    <h2><code style="font-size:1rem">/api/systems</code> endpoint</h2>
+    <p class="caption">
+      Raw JSON state for all systems. Wire it into your own dashboards, alerting pipelines,
+      or whatever else you can think of. It's just an HTTP GET.
+    </p>
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="url-bar">http://updownboard.local:8080/api/systems</span>
+      </div>
+      <div class="json-body"><span class="j-punct">{</span>
+  <span class="j-key">"Router"</span><span class="j-punct">: {</span>
+    <span class="j-key">"state"</span><span class="j-punct">:</span> <span class="j-str-g">"GREEN"</span><span class="j-punct">,</span>
+    <span class="j-key">"failed_checks"</span><span class="j-punct">:</span> <span class="j-punct">[],</span>
+    <span class="j-key">"last_checked"</span><span class="j-punct">:</span> <span class="j-str">"2026-06-03T11:14:31.004122+00:00"</span><span class="j-punct">,</span>
+    <span class="j-key">"reason"</span><span class="j-punct">:</span> <span class="j-str">"all checks passed"</span>
+  <span class="j-punct">},</span>
+  <span class="j-key">"prod-db-01"</span><span class="j-punct">: {</span>
+    <span class="j-key">"state"</span><span class="j-punct">:</span> <span class="j-str-r">"RED"</span><span class="j-punct">,</span>
+    <span class="j-key">"failed_checks"</span><span class="j-punct">: [</span>
+      <span class="j-punct">{</span> <span class="j-key">"type"</span><span class="j-punct">:</span> <span class="j-str">"ping"</span><span class="j-punct">,</span> <span class="j-key">"message"</span><span class="j-punct">:</span> <span class="j-str">"Ping failed: host unreachable"</span> <span class="j-punct">},</span>
+      <span class="j-punct">{</span> <span class="j-key">"type"</span><span class="j-punct">:</span> <span class="j-str">"tcp"</span><span class="j-punct">,</span>  <span class="j-key">"message"</span><span class="j-punct">:</span> <span class="j-str">"Port 5432 timed out"</span> <span class="j-punct">}</span>
+    <span class="j-punct">],</span>
+    <span class="j-key">"last_checked"</span><span class="j-punct">:</span> <span class="j-str">"2026-06-03T11:14:31.209847+00:00"</span><span class="j-punct">,</span>
+    <span class="j-key">"reason"</span><span class="j-punct">:</span> <span class="j-str">"ping: Ping failed: host unreachable; tcp: Port 5432 timed out"</span>
+  <span class="j-punct">},</span>
+  <span class="j-key">"Linux Server"</span><span class="j-punct">: {</span>
+    <span class="j-key">"state"</span><span class="j-punct">:</span> <span class="j-str-g">"GREEN"</span><span class="j-punct">,</span>
+    <span class="j-key">"failed_checks"</span><span class="j-punct">:</span> <span class="j-punct">[],</span>
+    <span class="j-key">"last_checked"</span><span class="j-punct">:</span> <span class="j-str">"2026-06-03T11:14:32.118934+00:00"</span><span class="j-punct">,</span>
+    <span class="j-key">"reason"</span><span class="j-punct">:</span> <span class="j-str">"all checks passed"</span>
+  <span class="j-punct">}</span>
+<span class="j-punct">}</span></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <a href="https://corkscrew-consulting.net" style="display:inline-flex;align-items:center;gap:10px;opacity:0.85;margin-bottom:10px;">
+    <img src="logo-ccg.svg" alt="Corkscrew Consulting Group" style="width:32px;height:32px;border-radius:50%;">
+    <span style="font-size:0.9rem;font-weight:600;color:#e6edf3;">Corkscrew Consulting Group</span>
+  </a>
+  <br>
+  <a href="index.html">Overview</a> &middot;
+  <a href="https://github.com/feedmittens/updownboard">GitHub</a> &middot;
+  MIT License
+</footer>
+
+</body>
+</html>
