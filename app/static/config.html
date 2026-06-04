@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpDownBoard — Config</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .config-wrap {
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .page-title   { font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+    .page-subtitle { font-size: 0.82rem; color: #64748b; margin-bottom: 2rem; }
+
+    /* ── Cards ── */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 0.85rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.3rem;
+    }
+
+    .hint { font-weight: 400; color: #475569; margin-left: 0.4rem; }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.45rem 0.7rem;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* ── System block ── */
+    .system-block {
+      background: #0f172a;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      margin-bottom: 0.85rem;
+      overflow: hidden;
+    }
+
+    .system-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .system-header:hover { background: #141f33; }
+
+    .system-chevron {
+      color: #475569;
+      font-size: 0.7rem;
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .system-block.open .system-chevron { transform: rotate(90deg); }
+
+    .system-name-display {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .system-host-display {
+      font-size: 0.78rem;
+      color: #475569;
+      font-family: "SFMono-Regular", Menlo, monospace;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      color: #475569;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-icon:hover { color: #f87171; background: #2b0d0d; }
+
+    .system-body {
+      padding: 0 1rem 1rem;
+      display: none;
+    }
+    .system-block.open .system-body { display: block; }
+
+    .system-fields { margin-bottom: 1rem; }
+
+    /* ── Checks ── */
+    .checks-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #475569;
+      margin-bottom: 0.6rem;
+    }
+
+    .check-row {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+
+    .check-row-inner { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .check-type-row { display: flex; gap: 0.5rem; align-items: center; }
+
+    .check-type-select {
+      width: auto;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+    }
+
+    .check-params { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .param-field { display: flex; flex-direction: column; gap: 0.2rem; min-width: 120px; flex: 1; }
+    .param-field label { font-size: 0.72rem; color: #64748b; margin: 0; }
+    .param-field input { font-size: 0.8rem; padding: 0.3rem 0.5rem; }
+
+    .add-check-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #3b82f6;
+      background: none;
+      border: 1px dashed #1d4ed8;
+      border-radius: 6px;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 0.25rem;
+      transition: background 0.15s;
+    }
+    .add-check-btn:hover { background: #1e3a5f; }
+
+    /* ── Global actions ── */
+    .add-system-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: none;
+      border: 1px dashed #334155;
+      border-radius: 10px;
+      color: #475569;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .add-system-btn:hover { color: #e2e8f0; border-color: #64748b; }
+
+    .action-bar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-ghost   { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+    .status-msg {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 5px;
+      display: none;
+    }
+    .status-msg.ok  { background: #0f2e1a; color: #4ade80; border: 1px solid #166534; display: block; }
+    .status-msg.err { background: #2b0d0d; color: #f87171; border: 1px solid #7f1d1d; display: block; }
+
+    @media (max-width: 520px) {
+      .row-2 { grid-template-columns: 1fr; }
+      .check-params { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><a href="/" style="color:inherit;text-decoration:none">UpDownBoard</a></h1>
+    <span id="last-updated"></span>
+    <a href="/settings" style="font-size:0.78rem;color:#64748b;text-decoration:none">&#9881; Settings</a>
+  </header>
+
+  <div class="config-wrap">
+    <div class="page-title">System configuration</div>
+    <div class="page-subtitle">
+      Changes are written to <code>config.yaml</code> and applied immediately — no restart required.
+    </div>
+
+    <!-- Global settings -->
+    <div class="card">
+      <div class="card-title">Poll settings</div>
+      <div class="row-2">
+        <div class="field">
+          <label>Poll interval <span class="hint">seconds</span></label>
+          <input type="number" id="poll_interval" min="5" max="3600" value="30">
+        </div>
+        <div class="field">
+          <label>History limit <span class="hint">max events stored</span></label>
+          <input type="number" id="history_limit" min="50" max="10000" value="500">
+        </div>
+      </div>
+    </div>
+
+    <!-- Systems list -->
+    <div id="systems-list"></div>
+
+    <button class="add-system-btn" onclick="addSystem()">&#43; Add system</button>
+
+    <div class="action-bar">
+      <button class="btn btn-primary" id="save-btn" onclick="saveConfig()">Save &amp; apply</button>
+      <button class="btn btn-ghost" onclick="loadConfig()">Discard changes</button>
+      <span class="status-msg" id="save-status"></span>
+    </div>
+  </div>
+
+  <script src="/static/config.js"></script>
+</body>
+</html>

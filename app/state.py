@@ -61,6 +61,13 @@ class StateStore:
                 (int(limit),),
             )
 
+    def remove_stale(self, active_names: set):
+        """Drop in-memory state for systems no longer in the config."""
+        with self._lock:
+            for name in list(self._current):
+                if name not in active_names:
+                    del self._current[name]
+
     def get_all_states(self) -> dict:
         with self._lock:
             return dict(self._current)
