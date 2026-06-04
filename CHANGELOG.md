@@ -6,6 +6,29 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.0] — 2026-06-03
+
+### Added
+- Email notification system: SMTP-based alerts on state changes, configurable cadence (down / recovery / both), subject + body templates
+- Web settings UI at `/settings`: SMTP config, addressing, cadence picker, template editor, test-email button; password masked in API responses; settings stored in `notifications.yaml` (gitignored)
+- Screenshots page on GitHub Pages (`/screenshots.html`) with HTML/CSS mockups of the dashboard, failure modal, `/status` output, and `/api/systems` JSON
+
+### Fixed
+- CI pipeline was failing on every PR due to incorrect `trivy-action` version pin and Bandit findings; all resolved:
+  - `trivy-action` pinned to correct tag `v0.36.0`
+  - CVE-2026-23949 (`jaraco.context`) and CVE-2026-24049 (`wheel`) patched by upgrading `pip`, `setuptools`, and `wheel` in the Docker build
+  - B508 (SNMPv1/v2), B507 (paramiko AutoAddPolicy), B601 (paramiko exec_command) suppressed with `# nosec` and documented rationale
+  - B608 (SQL f-string) fixed with parameterized query in `state.py`
+- SSH host key policy tightened: replaced `AutoAddPolicy` with `RejectPolicy` + `load_system_host_keys()` in `ssh_metrics` check
+
+### Changed
+- CCG website link corrected to `www.corkscrewconsulting.net` across docs and README
+- `StateStore.update()` now returns `(old_state, new_state, reason)` to let the monitor detect transitions without duplicating logic
+- `docker-compose.yml`: `config.yaml` mount changed from `:ro` to read-write to support config editor
+- `Dockerfile`: upgrades `pip`, `setuptools`, `wheel` before installing app deps
+
+---
+
 ## [0.2.0] — 2026-06-03
 
 ### Added
