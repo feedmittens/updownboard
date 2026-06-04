@@ -9,7 +9,7 @@ A lightweight network monitoring dashboard. Each system gets a GREEN or RED tile
 
 **[feedmittens.github.io/updownboard](https://feedmittens.github.io/updownboard)** — project page with install instructions
 
-**Version: 0.2.0**
+**Version: 0.3.0**
 
 ---
 
@@ -130,8 +130,10 @@ systems:
 | URL | Description |
 |-----|-------------|
 | `/` | Dashboard — RED/GREEN tile grid |
+| `/settings` | Notification settings UI (SMTP, cadence, templates) |
 | `/status` | Plain text: current state + recent changes (good for `watch curl http://host:8080/status`) |
 | `/api/systems` | JSON: current state of all systems |
+| `/api/settings` | GET/POST notification settings |
 
 ---
 
@@ -198,11 +200,10 @@ PRs welcome. Please:
 ## TODO
 
 - [ ] Tests: smoke tests for each check type
-- [ ] UI: in-app config editor (add/edit/remove systems without restarting)
-- [ ] Config: POST endpoint to reload config without restart
-- [ ] Notifications: optional webhook/email on state change
+- [ ] UI: in-app config editor (add/edit/remove systems without restarting) — in progress
 - [ ] SNMP v3 support
 - [ ] Windows: WMI metrics check (CPU/mem/disk without SSH)
+- [ ] Webhook notifications (Slack, Teams, etc.) in addition to email
 
 ---
 
