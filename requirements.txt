@@ -1,6 +1,6 @@
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
-pyyaml>=6.0
+pyyaml>=6.0.3
 httpx>=0.25.0
 paramiko>=5.0.0
 # pysnmp: use pysnmp-lextudio on Python 3.12+ (the original 4.x is broken there)
