@@ -4,4 +4,4 @@ pyyaml>=6.0
 httpx>=0.25.0
 paramiko>=5.0.0
 # pysnmp: use pysnmp-lextudio on Python 3.12+ (the original 4.x is broken there)
-pysnmp>=4.4.12
+pysnmp>=7.1.27
